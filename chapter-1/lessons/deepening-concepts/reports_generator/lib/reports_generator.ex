@@ -2,10 +2,10 @@ defmodule ReportsGenerator do
   def build(filename) do
     "reports/#{filename}"
     |> File.stream!()
-    |> Enum.reduce(%{},fn line, report -> 
-        [id, _food_name, price] = parse_line(line)
-        Map.put(report, id, price)
-       end)
+    |> Enum.reduce(report_acc,fn line, report ->
+      [id, _food_name, price] = parse_line(line)
+      Map.put(report, id, report[id] + price)
+    end)
   end
 
   defp parse_line(line) do
@@ -14,4 +14,6 @@ defmodule ReportsGenerator do
     |> String.split(",")
     |> List.update_at(2, &String.to_integer/1)
   end
+
+  def report_acc, do: Enum.into(1..30, %{}, &{"#{&1}", 0})
 end
